@@ -1,0 +1,26 @@
+{
+  "name": "medusa-scaffolder",
+  "version": "1.0.0",
+  "module": "index.ts",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "bin": {
+    "medusa-gen": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bunx tsc && chmod +x dist/index.js && bun link"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.10.1",
+    "chalk": "4",
+    "commander": "^14.0.2",
+    "fs-extra": "^11.3.2",
+    "ts-morph": "^27.0.2"
+  }
+}
