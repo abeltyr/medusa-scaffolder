@@ -89,6 +89,7 @@ export const typeGenerator = async ({
   );
 };
 
+// TODO:Optimize the index setup to prevent repetition of types
 export const typeIndexGenerator = async ({
   fileName,
   srcDir,

@@ -1,4 +1,3 @@
-import { SourceFile } from "ts-morph";
 import * as fs from "fs-extra";
 import * as path from "path";
 import chalk from "chalk";
@@ -119,6 +118,7 @@ export const workflowGenerator = async ({
   );
 };
 
+// TODO:Optimize the index setup to prevent repetition of steps and workflows
 export const workflowIndexGenerator = async ({
   fileName,
   srcDir,

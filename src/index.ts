@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { Project } from "ts-morph";
-import * as fs from "fs-extra";
-import * as path from "path";
-import chalk from "chalk";
-import { modelExtractor } from "./model";
-import { getAllFiles } from "./utils/getAllFiles";
+import { getAllFiles } from "./extractor/getAllFiles";
 import { nameExtractor } from "./extractor/name";
 import { typeGenerator, typeIndexGenerator } from "./generator/type";
 import {
