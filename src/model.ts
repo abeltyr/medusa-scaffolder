@@ -2,23 +2,20 @@ import { SourceFile, SyntaxKind, VariableDeclaration } from "ts-morph";
 import * as fs from "fs-extra";
 import * as path from "path";
 import chalk from "chalk";
-import {
-  generateHttpTypes,
-  generateModuleTypes,
-  generateQueryTypes,
-  generateServiceTypes,
-} from "./templates/type";
-import {
-  generateCreateSteps,
-  generateCreateWorkflows,
-  generateUpdateSteps,
-  generateUpdateWorkflows,
-  generateDeleteSteps,
-  generateDeleteWorkflows,
-} from "./templates/workflows";
+
+import generateHttpTypes from "./templates/type/http";
+import generateModuleTypes from "./templates/type/module";
+import generateQueryTypes from "./templates/type/query";
+import generateServiceTypes from "./templates/type/service";
 import { TemplateData } from "./type/shard";
-import { generateIndexTypes } from "./templates/index/type";
-import { generateIndexWorkflows } from "./templates/index/workflows";
+import generateIndexTypes from "./templates/index/type";
+import generateIndexWorkflows from "./templates/index/workflows";
+import generateCreateSteps from "./templates/workflows/step/create";
+import generateUpdateSteps from "./templates/workflows/step/update";
+import generateDeleteSteps from "./templates/workflows/step/delete";
+import generateCreateWorkflows from "./templates/workflows/workflow/create";
+import generateUpdateWorkflows from "./templates/workflows/workflow/update";
+import generateDeleteWorkflows from "./templates/workflows/workflow/delete";
 
 export const modelExtractor = async ({
   sourceFile,
@@ -237,25 +234,9 @@ export const modelExtractor = async ({
   const stepFullPath = path.join(stepDir, "index.ts");
   await fs.appendFile(stepFullPath, `export * from './${baseFileName}';\n`);
 
-  const typesDir = path.join(srcDir, `types`);
-  const typesFullPath = path.join(typesDir, "index.ts");
-  await fs.appendFile(typesFullPath, `export * from './${fileName}';\n`);
-
-  const moduleWorkflowDir = path.join(srcDir, `workflows/${fileName}`);
-  const moduleWorkflowPath = path.join(moduleWorkflowDir, "index.ts");
-  await fs.appendFile(
-    moduleWorkflowPath,
-    `
-export * from "./steps";
-export * from "./workflows";
-    `,
-  );
-
-  const workDir = path.join(srcDir, `workflows`);
-  const workFullPath = path.join(workDir, "index.ts");
-  await fs.appendFile(workFullPath, `export * from './${fileName}';\n`);
-
   console.log(
     chalk.blue(`\nGeneration ${baseFileName} from ${fileName} Complete! 🚀`),
   );
+
+  return { baseFileName, fileName, srcDir };
 };

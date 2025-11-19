@@ -102,3 +102,5 @@ export interface I${modelName}ModuleService extends IModuleService {
 }
 `;
 };
+
+export default generateServiceTypes;

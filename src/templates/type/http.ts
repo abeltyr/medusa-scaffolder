@@ -54,3 +54,5 @@ export type Store${modelName}PreviewResponse = {
 };
 `;
 };
+
+export default generateHttpTypes;

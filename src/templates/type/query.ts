@@ -12,3 +12,5 @@ import { Module${modelName} } from "../module";
 export type Query${modelName} = Module${modelName};
   `;
 };
+
+export default generateQueryTypes;

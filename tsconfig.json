@@ -6,9 +6,17 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "./dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/types/**/*",
+    "src/modules/**/*",
+    "src/workflows/**/*",
+    "**/*.spec.ts"
   ]
 }

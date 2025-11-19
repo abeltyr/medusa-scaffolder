@@ -1,28 +1,10 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { Project, SyntaxKind, VariableDeclaration } from "ts-morph";
+import { Project } from "ts-morph";
 import * as fs from "fs-extra";
 import * as path from "path";
 import chalk from "chalk";
-import { toKebabCase } from "./utils";
-import {
-  generateHttpTypes,
-  generateModuleTypes,
-  generateQueryTypes,
-  generateServiceTypes,
-} from "./templates/type";
-import {
-  generateCreateSteps,
-  generateCreateWorkflows,
-  generateUpdateSteps,
-  generateUpdateWorkflows,
-  generateDeleteSteps,
-  generateDeleteWorkflows,
-} from "./templates/workflows";
-import { TemplateData } from "./type/shard";
-import { generateIndexTypes } from "./templates/index/type";
-import { generateIndexWorkflows } from "./templates/index/workflows";
 import { modelExtractor } from "./model";
 import { getAllFiles } from "./utils/getAllFiles";
 
@@ -33,12 +15,15 @@ program
   .description("Generate Types, Steps, and Workflows from a Medusa Model")
   .version("1.0.0")
   .argument(
-    "<folder>",
-    "Path to the folder containing model files (e.g., src/modules/finance/models)",
+    "<ModuleName>",
+    "Path to the module folder containing model files (e.g., src/modules/finance/models)",
   )
   .option("-o, --output <dir>", "Output root directory", "src/modules")
-  .action(async (folderPath, options) => {
-    const filePaths = getAllFiles(folderPath);
+  .action(async (moduleName, options) => {
+    const filePaths = getAllFiles(`src/modules/${moduleName}/models`);
+
+    let fileName,
+      srcDir = "";
     for (const filePath of filePaths) {
       if (filePath.includes("index.ts")) {
         continue;
@@ -56,8 +41,31 @@ program
       const project = new Project();
       const sourceFile = project.addSourceFileAtPath(absolutePath);
 
-      await modelExtractor({ sourceFile, absolutePath });
+      const data = await modelExtractor({
+        sourceFile,
+        absolutePath,
+      });
+      fileName = data.fileName;
+      srcDir = data.srcDir;
     }
+
+    const moduleWorkflowDir = path.join(srcDir, `workflows/${fileName}`);
+    const moduleWorkflowPath = path.join(moduleWorkflowDir, "index.ts");
+    await fs.appendFile(
+      moduleWorkflowPath,
+      `
+export * from "./steps";
+export * from "./workflows";
+    `,
+    );
+
+    const typesDir = path.join(srcDir, `types`);
+    const typesFullPath = path.join(typesDir, "index.ts");
+    await fs.appendFile(typesFullPath, `export * from './${fileName}';\n`);
+
+    const workDir = path.join(srcDir, `workflows`);
+    const workFullPath = path.join(workDir, "index.ts");
+    await fs.appendFile(workFullPath, `export * from './${fileName}';\n`);
   });
 
 program.parse();

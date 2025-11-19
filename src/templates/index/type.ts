@@ -6,3 +6,5 @@ export * from "./query";
 export * from "./service";
 `;
 };
+
+export default generateIndexTypes;

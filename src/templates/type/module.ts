@@ -22,3 +22,5 @@ export type ModuleDelete${modelName} = {
 };
 `;
 };
+
+export default generateModuleTypes;
