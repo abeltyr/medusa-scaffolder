@@ -3,19 +3,23 @@ import { TemplateData } from "../../../type/shard";
 import { toPascalCase, toCamelCase, toKebabCase } from "../../../utils";
 
 // 2. GENERATE Create STEPS
-export const generateCreateSteps = ({ modelName, tableName }: TemplateData) => {
+export const generateCreateSteps = ({
+  modelName,
+  tableName,
+  fileName,
+}: TemplateData) => {
   const camelName = toCamelCase(modelName);
 
   return `
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk";
-import { ${tableName.toUpperCase()}_MODULE } from "../models/${tableName}";
+import { ${fileName.toUpperCase()}_MODULE } from "../../../../modules/${fileName}";
 import { I${modelName}ModuleService, ModuleCreate${modelName} } from "../../../../types";
 
 export const create${modelName}sStep = createStep(
   "create-${toKebabCase(modelName)}s",
   async (input: ModuleCreate${modelName}[], { container }) => {
     const ${camelName}ModuleService =
-      container.resolve<I${modelName}ModuleService>(ACCOUNT_MODULE);
+      container.resolve<I${modelName}ModuleService>(${fileName.toUpperCase()}_MODULE);
 
     const ${camelName}s = await ${camelName}ModuleService.create${modelName}s(input);
 
@@ -30,7 +34,7 @@ export const create${modelName}sStep = createStep(
     }
 
     const ${camelName}ModuleService =
-      container.resolve<I${modelName}ModuleService>(ACCOUNT_MODULE);
+      container.resolve<I${modelName}ModuleService>(${fileName.toUpperCase()}_MODULE);
 
     await ${camelName}ModuleService.delete${modelName}s(${camelName}Ids);
   },
