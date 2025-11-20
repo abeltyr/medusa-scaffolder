@@ -17,6 +17,7 @@
     "src/types/**/*",
     "src/modules/**/*",
     "src/workflows/**/*",
+    "src/router/**/*",
     "**/*.spec.ts"
   ]
 }

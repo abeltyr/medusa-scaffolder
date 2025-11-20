@@ -9,6 +9,8 @@ import {
   workflowIndexGenerator,
 } from "./generator/workflow";
 import { sourceExtractor } from "./extractor/source";
+import { serviceGenerator } from './generator/services';
+import { middlewareGenerator } from './generator/middleware';
 
 const program = new Command();
 
@@ -21,7 +23,21 @@ program
     "Path to the module folder containing model files (e.g., src/modules/finance/models)",
   )
   .option("-o, --output <dir>", "Output root directory", "src/modules")
+  .option("--type", "Generate type files")
+  .option("--workflow", "Generate workflow files")
+  .option("--service", "Generate service files")
+  .option("--middleware", "Generate middleware files")
+  .option("--all", "Generate everything")
   .action(async (moduleName, options) => {
+    const selected = [];
+
+    if (options.all) selected.push("type", "workflow", "service", "middleware");
+    if (options.type) selected.push("type");
+    if (options.workflow) selected.push("workflow");
+    if (options.service) selected.push("service");
+    if (options.middleware) selected.push("middleware");
+
+
     const filePaths = getAllFiles(`src/modules/${moduleName}/models`);
     let fileName: string = "";
     let srcDir: string = "";
@@ -43,16 +59,35 @@ program
         absolutePath,
       });
 
-      await typeGenerator({ ...data, start, updateState });
+      if (selected.includes("type")) {
+        await typeGenerator({ ...data, start, updateState });
+      }
 
-      await workflowGenerator({ ...data, start, updateState });
+      if (selected.includes("workflow")) {
+        await workflowGenerator({ ...data, start, updateState });
+      }
+
+      if (selected.includes("service")) {
+        await serviceGenerator({ ...data, start, updateState });
+      }
+
+
+      if (selected.includes("middleware")) {
+        await middlewareGenerator({ ...data, start, updateState });
+      }
+
+
 
       fileName = data.fileName;
       srcDir = data.srcDir;
     }
 
-    await workflowIndexGenerator({ fileName, srcDir });
-    await typeIndexGenerator({ fileName, srcDir });
+    if (selected.includes("workflow")) {
+      await workflowIndexGenerator({ fileName, srcDir });
+    }
+    if (selected.includes("type")) {
+      await typeIndexGenerator({ fileName, srcDir });
+    }
   });
 
 program.parse();
