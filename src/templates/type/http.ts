@@ -1,4 +1,5 @@
 import { TemplateData } from "../../type/shard";
+import { toCamelCase } from '../../utils';
 
 // 1. GENERATE TYPES
 export const generateHttpTypes = ({
@@ -26,7 +27,7 @@ export type Admin${modelName}Response = {
 };
 
 export type Admin${modelName}sResponse = PaginatedResponse<{
-  workspace${modelName}s: Query${modelName}[];
+  ${toCamelCase(modelName)}s: Query${modelName}[];
 }>;
 
 export type AdminCreate${modelName} = ModuleCreate${modelName};
@@ -44,7 +45,7 @@ export type Store${modelName}Response = {
 };
 
 export type Store${modelName}sResponse = PaginatedResponse<{
-  workspace${modelName}s: Query${modelName}[];
+  ${toCamelCase(modelName)}s: Query${modelName}[];
 }>;
 
 export type Store${modelName}PreviewResponse = {
