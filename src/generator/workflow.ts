@@ -3,7 +3,7 @@ import * as path from "path";
 import chalk from "chalk";
 
 import generateIndexWorkflows from "../templates/index/workflows";
-import generateIndexSteps from "../templates/index/workflows";
+import generateIndexSteps from "../templates/index/steps";
 import generateCreateSteps from "../templates/workflows/step/create";
 import generateUpdateSteps from "../templates/workflows/step/update";
 import generateUnlinkSteps from "../templates/workflows/step/unlink";

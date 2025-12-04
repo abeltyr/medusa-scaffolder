@@ -9,6 +9,7 @@ export const generateUnlinkSteps = ({
   fileName,
 }: TemplateData) => {
   const camelName = toCamelCase(modelName);
+  const pascalName = toPascalCase(modelName);
 
   return `import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
@@ -24,7 +25,7 @@ export const delete${modelName}LinksStep = createStep(
         const link = container.resolve(ContainerRegistrationKeys.LINK)
 
         await link.delete({
-            [${fileName.toUpperCase()}_MODULE]: { ${camelName}_id: id },
+            [${fileName.toUpperCase()}_MODULE]: { ${pascalName}_id: id },
         })
 
         return new StepResponse(null)
