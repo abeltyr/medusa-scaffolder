@@ -9,9 +9,8 @@ export const generateCreateWorkflows = ({
 }: TemplateData) => {
   const camelName = toCamelCase(modelName);
 
-  return `
-import { createWorkflow, WorkflowResponse } from "@medusajs/workflows-sdk";
-import { ModuleCreate${modelName} } from  '../../../../types';
+  return `import { createWorkflow, WorkflowResponse } from "@medusajs/workflows-sdk";
+import { ModuleCreate${modelName} } from "../../../../types";
 import { create${modelName}sStep } from "../../steps";
 
 export const create${modelName}sWorkflow = createWorkflow(

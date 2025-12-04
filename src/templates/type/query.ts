@@ -6,8 +6,7 @@ export const generateQueryTypes = ({
   tableName,
   fileName,
 }: TemplateData) => {
-  return `
-import { Module${modelName} } from "../module";
+  return `import { Module${modelName} } from "../module";
 
 export type Query${modelName} = Module${modelName};
   `;

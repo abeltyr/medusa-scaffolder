@@ -6,8 +6,7 @@ export const generateModuleTypes = ({
   tableName,
   fileName,
 }: TemplateData) => {
-  return `
-import { ${modelName}DTO } from "../../../modules/${fileName}/types/common";
+  return `import { ${modelName}DTO } from "../../../modules/${fileName}/types/common";
 
 export type Module${modelName} = ${modelName}DTO;
 

@@ -27,7 +27,6 @@ export const ${camelName}CreateService = async (
         data: Array.isArray(req.body)
           ? req.body.map((${camelName}) => ({ ...${camelName} }))
           : [{ ...req.body }],
-        userId: req.auth_context.actor_id,
       },
       container: req.scope,
     });
@@ -49,13 +48,14 @@ export const ${camelName}CreateService = async (
         data: ${camelName}s?.[0],
       });
     } catch (e) {
-      console.log(e);
+      console.log("Query ${modelName} ERROR", e);
       return res.json({
         status: 200,
         data: created${modelName}s,
       });
     }
   } catch (e) {
+    console.log("CREATE ${modelName} ERROR", e);
     res.json({
       status: 500,
       error: e,

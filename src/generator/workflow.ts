@@ -3,8 +3,10 @@ import * as path from "path";
 import chalk from "chalk";
 
 import generateIndexWorkflows from "../templates/index/workflows";
+import generateIndexSteps from "../templates/index/workflows";
 import generateCreateSteps from "../templates/workflows/step/create";
 import generateUpdateSteps from "../templates/workflows/step/update";
+import generateUnlinkSteps from "../templates/workflows/step/unlink";
 import generateDeleteSteps from "../templates/workflows/step/delete";
 import generateCreateWorkflows from "../templates/workflows/workflow/create";
 import generateUpdateWorkflows from "../templates/workflows/workflow/update";
@@ -46,10 +48,17 @@ export const workflowGenerator = async ({
       shouldIndex: true,
     },
     {
-      type: "generateIndexWorkflows",
+      type: "generateUnlinkSteps",
+      dir: path.join(srcDir, `workflows/${fileName}/steps/${baseFileName}`),
+      file: `unlink.ts`,
+      content: generateUnlinkSteps(data),
+      shouldIndex: true,
+    },
+    {
+      type: "generateIndexSteps",
       dir: path.join(srcDir, `workflows/${fileName}/steps/${baseFileName}`),
       file: `index.ts`,
-      content: generateIndexWorkflows(),
+      content: generateIndexSteps(),
       shouldIndex: false,
     },
     {

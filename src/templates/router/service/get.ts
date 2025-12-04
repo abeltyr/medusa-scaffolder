@@ -3,8 +3,7 @@ import { toPascalCase, toCamelCase, toSnakeCase } from "../../../utils";
 
 export const generateGetService = ({ modelName }: TemplateData) => {
   const camelName = toCamelCase(modelName);
-  return `
-import {
+  return `import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework";
@@ -40,6 +39,7 @@ export const ${camelName}GetService = async (
       data: ${camelName}s[0],
     });
   } catch (e) {
+    console.log("GET ${modelName} ERROR", e);
     res.json({
       status: 500,
       error: e,

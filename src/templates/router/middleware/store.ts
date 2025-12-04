@@ -7,8 +7,7 @@ export const generateStoreMiddleware = ({ modelName }: TemplateData) => {
   const snakeName = toSnakeCase(modelName);
   const constantName = snakeName?.toUpperCase();
 
-  return `
-import { authenticate } from "@medusajs/framework";
+  return `import { authenticate } from "@medusajs/framework";
 import { MiddlewareRoute } from "@medusajs/medusa";
 
 export const stroe${modelName}sPathMiddlewares: MiddlewareRoute[] = [

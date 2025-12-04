@@ -5,8 +5,7 @@ export const generateGetAllService = ({ modelName }: TemplateData) => {
   const camelName = toCamelCase(modelName);
 
 
-  return `
-import {
+  return `import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework";

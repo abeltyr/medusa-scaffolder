@@ -10,11 +10,9 @@ export const generateDeleteSteps = ({
 }: TemplateData) => {
   const camelName = toCamelCase(modelName);
 
-  return `
-import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk";
+  return `import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk";
 import { ${fileName.toUpperCase()}_MODULE } from "../../../../modules/${fileName}";
 import { I${modelName}ModuleService } from "../../../../types";
-
 
 export const delete${modelName}sStep = createStep(
   "delete-${toKebabCase(modelName)}",

@@ -7,8 +7,7 @@ export const generateUpdateWorkflows = ({
   modelName,
   tableName,
 }: TemplateData) => {
-  return `
-import { createWorkflow, WorkflowResponse } from "@medusajs/workflows-sdk";
+  return `import { createWorkflow, WorkflowResponse } from "@medusajs/workflows-sdk";
 import { ModuleUpdate${modelName} } from "../../../../types";
 import { update${modelName}Step } from "../../steps";
 

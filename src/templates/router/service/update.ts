@@ -5,8 +5,7 @@ export const generateUpdateService = ({ modelName, fileName }: TemplateData) => 
   const camelName = toCamelCase(modelName);
 
 
-  return `
-import {
+  return `import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework";
@@ -46,6 +45,7 @@ export const ${camelName}UpdateService = async (
 
     res.json({ status: 200, data: ${camelName} });
   } catch (e) {
+    console.log("UPDATE ${modelName} ERROR", e);
     res.json({
       status: 500,
       error: e,

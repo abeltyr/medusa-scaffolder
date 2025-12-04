@@ -1,11 +1,10 @@
 import { TemplateData } from "../../../type/shard";
-import { toPascalCase, toCamelCase, toKebabCase, toSnakeCase } from "../../../utils";
+import { toCamelCase, toKebabCase, toSnakeCase } from "../../../utils";
 
 export const generateAdminMiddleware = ({ modelName }: TemplateData) => {
   const snakeName = toSnakeCase(modelName);
 
-  return `
-import {
+  return `import {
   validateAndTransformBody,
   validateAndTransformQuery,
 } from "@medusajs/framework";

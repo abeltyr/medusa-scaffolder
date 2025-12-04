@@ -10,8 +10,7 @@ export const generateUpdateSteps = ({
 }: TemplateData) => {
   const camelName = toCamelCase(modelName);
 
-  return `
-import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk";
+  return `import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk";
 import { ${fileName.toUpperCase()}_MODULE } from "../../../../modules/${fileName}";
 import { I${modelName}ModuleService, ModuleUpdate${modelName} } from "../../../../types";
 

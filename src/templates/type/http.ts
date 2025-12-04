@@ -7,8 +7,7 @@ export const generateHttpTypes = ({
   tableName,
   fileName,
 }: TemplateData) => {
-  return `
-import { FindParams, PaginatedResponse } from "@medusajs/types";
+  return `import { FindParams, PaginatedResponse } from "@medusajs/types";
 import { Query${modelName} } from "../query";
 import { Module${modelName}Filters } from "../service";
 import { ModuleCreate${modelName}, ModuleUpdate${modelName} } from "../module";
@@ -16,7 +15,7 @@ import { MedusaError } from "@medusajs/framework/utils";
 
 /* Filters */
 
-export interface ${modelName}FilterParams extends FindParams, Module${modelName}Filters {}
+export interface ${modelName}FilterParams extends FindParams, Module${modelName}Filters { }
 /* Admin */
 
 /* ${modelName} */

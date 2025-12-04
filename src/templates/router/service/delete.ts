@@ -5,8 +5,7 @@ export const generateDeleteService = ({ modelName, fileName }: TemplateData) => 
   const camelName = toCamelCase(modelName);
 
 
-  return `
-import {
+  return `import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework";
@@ -18,7 +17,7 @@ export const ${camelName}DeleteService = async (
 ) => {
   const { ${camelName}Id } = req.params;
   try {
-    const { result } = await delete${modelName}sWorkflow.run({
+    const { result } = await delete${modelName}sWorkflow(req.scope).run({
       input: {
         id: ${camelName}Id,
       },
@@ -32,6 +31,7 @@ export const ${camelName}DeleteService = async (
       },
     });
   } catch (e) {
+    console.log("DELETE ${modelName} ERROR", e);
     res.json({
       status: 500,
       error: e,

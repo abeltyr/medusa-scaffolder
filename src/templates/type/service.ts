@@ -6,8 +6,7 @@ export const generateServiceTypes = ({
   tableName,
   fileName,
 }: TemplateData) => {
-  return `
-import {
+  return `import {
   BaseFilterable,
   Context,
   FindConfig,
@@ -82,14 +81,14 @@ export interface I${modelName}ModuleService extends IModuleService {
    * @param sharedContext - The shared context.
    * @returns The upsert ${modelName}.
    */
-    upsert${modelName}(
-      data: Partial<ModuleCreate${modelName}>,
-      sharedContext?: Context,
-    ): Promise<{
-      result: Module${modelName}[];
-      originalRecords: Module${modelName}[];
-      newRecordIds: string[];
-    }>;
+  upsert${modelName}(
+    data: Partial<ModuleCreate${modelName}>,
+    sharedContext?: Context,
+  ): Promise<{
+    result: Module${modelName}[];
+    originalRecords: Module${modelName}[];
+    newRecordIds: string[];
+  }>;
 
   compensateUpsert(
     compensationData: {
@@ -98,7 +97,7 @@ export interface I${modelName}ModuleService extends IModuleService {
       type: string;
     },
     sharedContext?: Context,
-  ): Promise<void>;    
+  ): Promise<void>;
 }
 `;
 };
