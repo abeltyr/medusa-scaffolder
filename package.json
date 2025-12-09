@@ -1,8 +1,9 @@
 {
   "name": "medusa-scaffolder",
   "version": "1.0.0",
+  "description": "A CLI tool to scaffold CRUD boilerplate for MedusaJS projects",
   "module": "index.ts",
-  "private": true,
+  "license": "MIT",
   "devDependencies": {
     "@types/bun": "latest"
   },

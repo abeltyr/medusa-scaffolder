@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![Bun](https://img.shields.io/badge/bun-%3E%3D1.0.0-orange.svg)
-![License](https://img.shields.io/badge/license-Private-red.svg)
+![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)
 
 **A powerful CLI tool designed to accelerate MedusaJS development by automating the generation of essential code artifacts.**
 
@@ -15,30 +15,36 @@
 
 ## 📋 Table of Contents
 
-- [Overview](#-overview)
+- [Why This Tool?](#-why-this-tool)
 - [Features](#-features)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
-- [Project Structure](#-project-structure)
 - [CLI Usage](#-cli-usage)
-- [Generated Output](#-generated-output)
+- [Generated Project Layout](#-generated-project-layout)
 - [Examples](#-examples)
 - [Development](#-development)
 - [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## 🌟 Overview
+## 💡 Why This Tool?
 
-**Medusa Scaffolder** (`medusa-scaffolder`) is a code generation utility that analyzes your MedusaJS data models and automatically creates the corresponding:
+This scaffolder was created to **quickly bootstrap basic CRUD operations** in MedusaJS projects. When starting a new module that only needs standard Create, Read, Update, and Delete functionality—without advanced features—setting up all the boilerplate manually is tedious and error-prone.
 
-- **TypeScript Type Definitions**
-- **Workflow Definitions & Steps**
-- **Service Layer Functions**
-- **API Middleware**
+**Instead of spending hours writing:**
+- Type definitions for HTTP responses, modules, queries, and services
+- Workflow steps for create, update, delete, and unlink operations
+- Service layer functions for CRUD operations
+- Middleware for admin and store routes
 
-By automating repetitive boilerplate code generation, it ensures consistency across your codebase and significantly speeds up development.
+**Just run one command and get a complete, consistent base setup in seconds.**
+
+This is ideal for:
+- 🚀 **Rapid prototyping** - Get a working CRUD module quickly
+- 📦 **New modules** - Bootstrap standard entity management
+- 🔄 **Consistency** - Ensure all modules follow the same patterns
+- ⏱️ **Time savings** - Focus on business logic, not boilerplate
 
 ---
 
@@ -46,9 +52,9 @@ By automating repetitive boilerplate code generation, it ensures consistency acr
 
 | Feature | Description |
 |---------|-------------|
-| 🔷 **Type Generation** | Automatically creates TypeScript interfaces for HTTP responses, modules, queries, and services based on your Medusa models |
-| ⚡ **Workflow Generation** | Scaffolds complete workflow definitions including `create`, `update`, `delete`, and `unlink` steps |
-| 🛠 **Service Generation** | Generates full CRUD service layer (create, read, update, delete, getAll) |
+| 🔷 **Type Generation** | Creates TypeScript interfaces for HTTP responses, modules, queries, and services |
+| ⚡ **Workflow Generation** | Scaffolds complete workflow definitions with `create`, `update`, `delete`, and `unlink` steps |
+| 🛠 **Service Generation** | Generates full CRUD service layer (create, update, delete, get, getAll) |
 | 🔐 **Middleware Generation** | Creates admin and store middleware structures |
 | 📦 **Modular Architecture** | Generate specific artifacts individually or all at once |
 | 🎯 **Smart Parsing** | Uses `ts-morph` for intelligent TypeScript AST parsing |
@@ -64,7 +70,7 @@ Before using this tool, ensure you have:
 - **[Node.js](https://nodejs.org)** `v18.0.0` or higher
 - **TypeScript** `v5.0` or higher
 - A **MedusaJS** project with models following the standard convention:
-  ```
+  ```typescript
   export const ModelName = model.define("table_name", { ... })
   ```
 
@@ -103,39 +109,6 @@ npm link
 
 ```bash
 medusa-gen --help
-```
-
-You should see the help output with available commands and options.
-
----
-
-## 📁 Project Structure
-
-```
-medusa-scaffolder/
-├── src/
-│   ├── index.ts              # Main CLI entry point (Commander.js setup)
-│   ├── extractor/            # Model parsing & metadata extraction
-│   │   ├── getAllFiles.ts    # Utility to get all model files
-│   │   ├── name.ts           # Extracts model name and table name
-│   │   ├── source.ts         # Creates ts-morph SourceFile
-│   │   └── data.ts           # Data extraction utilities
-│   ├── generator/            # Code generation logic
-│   │   ├── type.ts           # Type file generator
-│   │   ├── workflow.ts       # Workflow & steps generator
-│   │   ├── services.ts       # Service layer generator
-│   │   └── middleware.ts     # Middleware generator
-│   ├── templates/            # Code templates
-│   │   ├── type/             # Type templates (http, module, query, service)
-│   │   ├── workflows/        # Workflow templates (steps, workflows)
-│   │   ├── router/           # Router templates (service, middleware)
-│   │   └── index/            # Index file templates
-│   ├── type/                 # Shared TypeScript interfaces
-│   └── utils/                # Utility functions
-├── dist/                     # Compiled JavaScript output
-├── package.json
-├── tsconfig.json
-└── README.md
 ```
 
 ---
@@ -182,86 +155,103 @@ export const YourModel = model.define("your_model", {
   name: model.text(),
   description: model.text().nullable(),
   // ... other fields
-}).indexes([
-  // optional indexes
-]);
+});
 ```
-
-The scaffolder parses:
-- **Model Name**: From the exported const name (e.g., `YourModel`)
-- **Table Name**: From the first argument to `.define()` (e.g., `"your_model"`)
 
 ---
 
-## 📂 Generated Output
+## 📂 Generated Project Layout
 
-When you run `medusa-gen <module> --all`, the following structure is created:
-
-### Types (`src/types/<module>/`)
+When you run `medusa-gen` for your modules, it creates a well-organized structure following MedusaJS best practices:
 
 ```
-src/types/<module>/
-├── index.ts
-├── http/
-│   ├── index.ts
-│   └── <model>.ts          # Admin/Store response types, filter types
-├── module/
-│   ├── index.ts
-│   └── <model>.ts          # Create/Update module types
-├── query/
-│   ├── index.ts
-│   └── <model>.ts          # Query types
-└── service/
-    ├── index.ts
-    └── <model>.ts          # Service filter types
-```
-
-### Workflows (`src/workflows/<module>/`)
-
-```
-src/workflows/<module>/
-├── index.ts
-├── steps/
-│   ├── index.ts
-│   └── <model>/
+src/
+├── admin/                          # Admin UI components (manual)
+├── api/                            # API routes (manual)
+├── jobs/                           # Background jobs (manual)
+├── links/                          # Module links (manual)
+├── modules/                        # Your data models (input)
+│   └── <module>/
+│       └── models/
+│           └── <model>.ts          # ← Your model files go here
+│
+├── router/                         # Generated router layer
+│   ├── middleware/                 # API middleware
+│   │   └── <module>/
+│   │       └── <model>/
+│   │           ├── index.ts
+│   │           ├── admin.ts        # Admin route middleware
+│   │           └── store.ts        # Store route middleware
+│   │
+│   ├── query/                      # Query definitions (manual)
+│   │
+│   ├── service/                    # Generated service layer
+│   │   └── <module>/
+│   │       └── <model>/
+│   │           ├── index.ts
+│   │           ├── create.ts       # Create service
+│   │           ├── update.ts       # Update service
+│   │           ├── delete.ts       # Delete service
+│   │           ├── get.ts          # Get single item
+│   │           └── getAll.ts       # Get all with pagination
+│   │
+│   └── validators/                 # Request validators (manual)
+│
+├── scripts/                        # Scripts (manual)
+├── subscribers/                    # Event subscribers (manual)
+│
+├── types/                          # Generated type definitions
+│   ├── index.ts                    # Main barrel export
+│   ├── shared.ts                   # Shared types
+│   └── <module>/
 │       ├── index.ts
-│       ├── create.ts       # Create step
-│       ├── update.ts       # Update step
-│       ├── delete.ts       # Delete step
-│       └── unlink.ts       # Unlink step
-└── workflows/
-    ├── index.ts
-    └── <model>/
+│       ├── http/
+│       │   ├── index.ts
+│       │   └── <model>.ts          # HTTP response types
+│       ├── module/
+│       │   ├── index.ts
+│       │   └── <model>.ts          # Module types (Create/Update)
+│       ├── query/
+│       │   ├── index.ts
+│       │   └── <model>.ts          # Query types
+│       └── service/
+│           ├── index.ts
+│           └── <model>.ts          # Service filter types
+│
+├── utils/                          # Utilities (manual)
+│
+└── workflows/                      # Generated workflows
+    ├── index.ts                    # Main barrel export
+    ├── account/
+    ├── analytic/
+    └── <module>/
         ├── index.ts
-        ├── create.ts       # Create workflow
-        ├── update.ts       # Update workflow
-        └── delete.ts       # Delete workflow
+        ├── steps/
+        │   ├── index.ts
+        │   └── <model>/
+        │       ├── index.ts
+        │       ├── create.ts       # Create step
+        │       ├── update.ts       # Update step
+        │       ├── delete.ts       # Delete step
+        │       └── unlink.ts       # Unlink step
+        └── workflows/
+            ├── index.ts
+            └── <model>/
+                ├── index.ts
+                ├── create.ts       # Create workflow
+                ├── update.ts       # Update workflow
+                └── delete.ts       # Delete workflow
 ```
 
-### Services (`src/router/service/<module>/`)
+### What Gets Generated vs Manual
 
-```
-src/router/service/<module>/
-├── index.ts
-└── <model>/
-    ├── index.ts
-    ├── create.ts           # Create service function
-    ├── update.ts           # Update service function
-    ├── delete.ts           # Delete service function
-    ├── get.ts              # Get single item
-    └── getAll.ts           # Get all items with pagination
-```
+| Generated by `medusa-gen` | Created Manually |
+|---------------------------|------------------|
+| `src/types/<module>/`  | `src/router/query/` |
+| `src/workflows/<module>/` | `src/router/validators/` |
+| `src/router/service/<module>/` | `src/modules/<module>/types/` |
+| `src/router/middleware/<module>/` | |
 
-### Middleware (`src/router/middleware/<module>/`)
-
-```
-src/router/middleware/<module>/
-├── index.ts
-└── <model>/
-    ├── index.ts
-    ├── admin.ts            # Admin route middleware
-    └── store.ts            # Store route middleware
-```
 
 ---
 
@@ -290,6 +280,8 @@ Generation types of event from event Complete! 🚀
 
 Created generateCreateSteps: src/workflows/event/steps/event/create.ts
 Created generateUpdateSteps: src/workflows/event/steps/event/update.ts
+Created generateDeleteSteps: src/workflows/event/steps/event/delete.ts
+Created generateUnlinkSteps: src/workflows/event/steps/event/unlink.ts
 ...
 
 Generation workflow event from event Complete! 🚀
@@ -306,7 +298,7 @@ medusa-gen ticket --type --workflow
 
 ### Example 3: Multiple Models in a Module
 
-If your module has multiple model files:
+The `medusa-gen` tool can handle multiple models in a module. If your module has multiple model files:
 
 ```
 src/modules/finance/models/
@@ -315,27 +307,9 @@ src/modules/finance/models/
 └── ledger.ts
 ```
 
-Running:
+Just run as usual:
 ```bash
-medusa-gen finance --all
-```
-
-Will generate artifacts for **all three models** in a single command.
-
-### Example 4: Development Mode (No Build)
-
-Run directly from TypeScript source without building:
-
-```bash
-bun run src/index.ts event --all
-```
-
-### Example 5: Custom Output Directory
-
-Specify a different output root:
-
-```bash
-medusa-gen event --all --output ./generated
+medusa-gen finance --type
 ```
 
 ---
@@ -362,43 +336,60 @@ bun run src/index.ts <module> --all
 bun run build
 ```
 
-This compiles TypeScript to `./dist/` and links the CLI globally.
+### Project Structure
+
+```
+medusa-scaffolder/
+├── src/
+│   ├── index.ts              # Main CLI entry point
+│   ├── extractor/            # Model parsing & metadata extraction
+│   │   ├── getAllFiles.ts
+│   │   ├── name.ts
+│   │   ├── source.ts
+│   │   └── data.ts
+│   ├── generator/            # Code generation logic
+│   │   ├── type.ts
+│   │   ├── workflow.ts
+│   │   ├── services.ts
+│   │   └── middleware.ts
+│   ├── templates/            # Code templates
+│   │   ├── type/
+│   │   ├── workflows/
+│   │   ├── router/
+│   │   └── index/
+│   ├── type/
+│   └── utils/
+├── dist/
+├── package.json
+└── tsconfig.json
+```
 
 ### Key Dependencies
 
 | Package | Purpose |
 |---------|---------|
 | `commander` | CLI argument parsing |
-| `ts-morph` | TypeScript AST parsing & manipulation |
+| `ts-morph` | TypeScript AST parsing |
 | `fs-extra` | Enhanced file system operations |
 | `chalk` | Terminal output styling |
-
-### Adding New Generators
-
-1. Create a new template in `src/templates/`
-2. Create a generator in `src/generator/`
-3. Add a new CLI option in `src/index.ts`
-4. Update the action handler to include the new generator
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Issue: `medusa-gen: command not found`
+### `medusa-gen: command not found`
 
-**Solution:** Run the build command again:
+**Solution:** Run the build command:
 ```bash
 bun run build
 ```
 
-Or run directly with Bun:
+Or run directly:
 ```bash
 bun run src/index.ts <module> --all
 ```
 
-### Issue: "Could not find an exported model definition"
-
-**Cause:** The model file doesn't follow the expected pattern.
+### "Could not find an exported model definition"
 
 **Solution:** Ensure your model exports a variable using `model.define()`:
 ```typescript
@@ -407,16 +398,11 @@ export const MyModel = model.define("my_model", { ... });
 
 // ❌ Incorrect - not exported
 const MyModel = model.define("my_model", { ... });
-
-// ❌ Incorrect - named differently
-export const myModel = model.define("my_model", { ... });
 ```
 
-### Issue: "The first argument to `.define()` must be a string literal"
+### "The first argument to `.define()` must be a string literal"
 
-**Cause:** Using a variable instead of a string literal.
-
-**Solution:**
+**Solution:** Use a string literal, not a variable:
 ```typescript
 // ✅ Correct
 export const MyModel = model.define("my_model", { ... });
@@ -426,26 +412,9 @@ const tableName = "my_model";
 export const MyModel = model.define(tableName, { ... });
 ```
 
-### Issue: Files not generating in expected location
-
-**Solution:** Ensure your model files are in the correct location:
-```
-src/modules/<module-name>/models/<model-file>.ts
-```
-
 ---
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📚 Quick Reference Card
+## 📚 Quick Reference
 
 ```bash
 # Install & Setup
@@ -461,19 +430,42 @@ medusa-gen <module> --service --middleware
 # Development mode (skip build)
 bun run src/index.ts <module> --all
 
-# Help & Version
+# Help
 medusa-gen --help
-medusa-gen --version
 ```
 
 ---
 
 ## 📄 License
 
-Private - All rights reserved.
+MIT License
+
+Copyright (c) 2024
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ---
 
 <div align="center">
-Created with ❤️ for the MedusaJS ecosystem
+
+**Made with ❤️ for the MedusaJS ecosystem**
+
+*Simplifying CRUD boilerplate so you can focus on what matters*
+
 </div>
