@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green.svg)
 ![Bun](https://img.shields.io/badge/bun-%3E%3D1.0.0-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)
 

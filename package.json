@@ -1,8 +1,8 @@
 {
   "name": "medusa-scaffolder",
-  "version": "1.0.0",
-  "description": "A CLI tool to scaffold CRUD boilerplate for MedusaJS projects",
-  "module": "index.ts",
+  "version": "1.0.2",
+  "description": "A command-line generator that automates CRUD boilerplate and module scaffolding for MedusaJS.",
+  "main": "dist/index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -32,8 +32,12 @@
   "bin": {
     "medusa-gen": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "bunx tsc && chmod +x dist/index.js && bun link"
+    "build": "bunx tsc && chmod +x dist/index.js",
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "@types/fs-extra": "^11.0.4",
