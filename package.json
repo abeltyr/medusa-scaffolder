@@ -4,6 +4,25 @@
   "description": "A CLI tool to scaffold CRUD boilerplate for MedusaJS projects",
   "module": "index.ts",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abeltyr/medusa-scaffolder.git"
+  },
+  "keywords": [
+    "medusa",
+    "medusajs",
+    "scaffolder",
+    "generator",
+    "cli",
+    "boilerplate",
+    "crud",
+    "typescript"
+  ],
+  "author": "Medusa Scaffolder Contributors",
+  "bugs": {
+    "url": "https://github.com/abeltyr/medusa-scaffolder/issues"
+  },
+  "homepage": "https://github.com/abeltyr/medusa-scaffolder#readme",
   "devDependencies": {
     "@types/bun": "latest"
   },
