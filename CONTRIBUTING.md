@@ -156,7 +156,7 @@ src/
 
 ## 🙏 Thank You!
 
-Your contributions make this project better for the entire MedusaJS community. We appreciate your time and effort!
+This tool is open source and your contributions make this project better for the entire MedusaJS community.
 
 ---
 
