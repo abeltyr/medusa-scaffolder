@@ -1,0 +1,358 @@
+# TNPL Code Generators
+
+While I created the `validators` and `query` blocks manually file-by-file in our earlier steps, I definitely used automation scripts for the `middleware` and `api` folders! 
+
+To give you a complete and reproducible toolkit, I have written all **four** scripts for you below. You can save these as [.js](file:///Users/abellamesgen/Documents/work/New/client/bitperfect/bitperfect/fix_paths.js) files at the root of your project and run them using `node <filename>.js`. They are built to respect your nested router structures (e.g. `orders/items`, `configs/min-fees`).
+
+### 1. Validators Generator (`generate_validators.js`)
+This script generates the Zod validation schemas for all models.
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const models = [
+  'adminAction', 'chargeSchedule', 'config', 'configMinFee',
+  'defaultConfig', 'notification', 'order', 'orderHistory',
+  'orderItem', 'payment', 'return', 'returnItem'
+];
+
+const validatorsDir = path.join(__dirname, 'apps/backend/src/router/validators/tnpl');
+if (!fs.existsSync(validatorsDir)) fs.mkdirSync(validatorsDir, { recursive: true });
+
+models.forEach(model => {
+  const Name = model.charAt(0).toUpperCase() + model.slice(1);
+  const content = `import { z } from "zod";
+import { createFindParams, createSelectParams } from "@medusajs/medusa/api/utils/validators";
+
+export const AdminGet${Name}Params = createSelectParams();
+export type AdminGet${Name}ParamsType = z.infer<typeof AdminGet${Name}Params>;
+
+export const AdminCreate${Name} = z.object({
+  // Add your creation fields here
+}).strict();
+export type AdminCreate${Name}Type = z.infer<typeof AdminCreate${Name}>;
+
+export const AdminUpdate${Name} = z.object({
+  // Add your update fields here
+}).strict();
+export type AdminUpdate${Name}Type = z.infer<typeof AdminUpdate${Name}>;
+`;
+
+  fs.writeFileSync(path.join(validatorsDir, `${model}.ts`), content);
+});
+
+// Create index.ts
+const indexContent = models.map(m => `export * from "./${m}";`).join('\\n') + '\\n';
+fs.writeFileSync(path.join(validatorsDir, 'index.ts'), indexContent);
+console.log('Validators generation complete.');
+```
+
+---
+
+### 2. Query Configuration Generator (`generate_queries.js`)
+This script generates the default response fields and `queryConfig` mapping for the Graph request layer.
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const models = [
+  { name: 'adminAction', plural: 'AdminActions' },
+  { name: 'chargeSchedule', plural: 'ChargeSchedules' },
+  { name: 'config', plural: 'Configs' },
+  { name: 'configMinFee', plural: 'ConfigMinFees' },
+  { name: 'defaultConfig', plural: 'DefaultConfigs' },
+  { name: 'notification', plural: 'Notifications' },
+  { name: 'order', plural: 'Orders' },
+  { name: 'orderHistory', plural: 'OrderHistories' },
+  { name: 'orderItem', plural: 'OrderItems' },
+  { name: 'payment', plural: 'Payments' },
+  { name: 'return', plural: 'Returns' },
+  { name: 'returnItem', plural: 'ReturnItems' },
+];
+
+const queryDir = path.join(__dirname, 'apps/backend/src/router/query/tnpl');
+if (!fs.existsSync(queryDir)) fs.mkdirSync(queryDir, { recursive: true });
+
+models.forEach(model => {
+  const Name = model.name.charAt(0).toUpperCase() + model.name.slice(1);
+  const content = `export const adminTnpl${Name}Fields = [
+  "id",
+  "created_at",
+  "updated_at",
+  // Add specific fields here
+];
+
+export const adminTnpl${model.plural}QueryConfig = {
+  list: {
+    defaults: adminTnpl${Name}Fields,
+    isList: true,
+  },
+  retrieve: {
+    defaults: adminTnpl${Name}Fields,
+    isList: false,
+  },
+  delete: {
+    defaults: ["id", "deleted_at"],
+    isList: false,
+  },
+};
+`;
+
+  fs.writeFileSync(path.join(queryDir, `${model.name}.ts`), content);
+});
+
+// Create index.ts
+const indexContent = models.map(m => `export * from "./${m.name}";`).join('\\n') + '\\n';
+fs.writeFileSync(path.join(queryDir, 'index.ts'), indexContent);
+console.log('Queries generation complete.');
+```
+
+---
+
+### 3. Middleware Generator ([generate_middlewares.js](file:///Users/abellamesgen/Documents/work/New/client/bitperfect/bitperfect/generate_middlewares.js))
+This safely constructs the middleware route mappings to tie your validators and your query configurations to Medusa's API router.
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const topLevelModels = [
+  { name: 'adminAction', singular: 'AdminAction', plural: 'AdminActions', pathKebab: 'admin-actions', idParam: 'tnplAdminActionId' },
+  { name: 'chargeSchedule', singular: 'ChargeSchedule', plural: 'ChargeSchedules', pathKebab: 'charge-schedules', idParam: 'tnplChargeScheduleId' },
+  { name: 'config', singular: 'Config', plural: 'Configs', pathKebab: 'configs', idParam: 'tnplConfigId' },
+  { name: 'notification', singular: 'Notification', plural: 'Notifications', pathKebab: 'notifications', idParam: 'tnplNotificationId' },
+  { name: 'order', singular: 'Order', plural: 'Orders', pathKebab: 'orders', idParam: 'tnplOrderId' },
+  { name: 'payment', singular: 'Payment', plural: 'Payments', pathKebab: 'payments', idParam: 'tnplPaymentId' },
+  { name: 'return', singular: 'Return', plural: 'Returns', pathKebab: 'returns', idParam: 'tnplReturnId' },
+];
+
+const nestedModels = [
+  { name: 'orderHistory', singular: 'OrderHistory', plural: 'OrderHistories', parentPath: 'orders', parentParam: 'tnplOrderId', pathKebab: 'histories', idParam: 'tnplOrderHistoryId', middlewareDir: 'order/histories' },
+  { name: 'orderItem', singular: 'OrderItem', plural: 'OrderItems', parentPath: 'orders', parentParam: 'tnplOrderId', pathKebab: 'items', idParam: 'tnplOrderItemId', middlewareDir: 'order/items' },
+  { name: 'defaultConfig', singular: 'DefaultConfig', plural: 'DefaultConfigs', parentPath: 'configs', parentParam: 'tnplConfigId', pathKebab: 'default', idParam: 'tnplDefaultConfigId', middlewareDir: 'config/default' },
+  { name: 'configMinFee', singular: 'ConfigMinFee', plural: 'ConfigMinFees', parentPath: 'configs', parentParam: 'tnplConfigId', pathKebab: 'min-fees', idParam: 'tnplConfigMinFeeId', middlewareDir: 'config/min-fees' },
+  { name: 'returnItem', singular: 'ReturnItem', plural: 'ReturnItems', parentPath: 'returns', parentParam: 'tnplReturnId', pathKebab: 'items', idParam: 'tnplReturnItemId', middlewareDir: 'return/items' },
+];
+
+const middlewareDir = path.join(__dirname, 'apps/backend/src/router/middleware/tnpl');
+fs.mkdirSync(middlewareDir, { recursive: true });
+
+function generateMiddleware(model, isNested) {
+  const mDir = isNested ? path.join(middlewareDir, model.middlewareDir) : path.join(middlewareDir, model.name);
+  fs.mkdirSync(mDir, { recursive: true });
+
+  const apiPathAdmin = isNested
+    ? \`/admin/tnpl/\${model.parentPath}/:\${model.parentParam}/\${model.pathKebab}\`
+    : \`/admin/tnpl/\${model.pathKebab}\`;
+
+  const apiPathStore = isNested
+    ? \`/store/tnpl/\${model.parentPath}/:\${model.parentParam}/\${model.pathKebab}\`
+    : \`/store/tnpl/\${model.pathKebab}\`;
+
+  const numUp = isNested ? 4 : 3;
+  const backLevels = Array(numUp).fill('..').join('/');
+
+  const adminTs = \`import {
+  validateAndTransformBody,
+  validateAndTransformQuery,
+} from "@medusajs/framework";
+import { MiddlewareRoute } from "@medusajs/medusa";
+import { adminTnpl\${model.plural}QueryConfig } from "\${backLevels}/query";
+import {
+  AdminCreate\${model.singular},
+  AdminGet\${model.singular}Params,
+  AdminUpdate\${model.singular},
+} from "\${backLevels}/validators";
+
+export const adminTnpl\${model.plural}PathMiddlewares: MiddlewareRoute[] = [
+  {
+    method: ["GET"],
+    matcher: "\${apiPathAdmin}",
+    middlewares: [
+      validateAndTransformQuery(
+        AdminGet\${model.singular}Params,
+        adminTnpl\${model.plural}QueryConfig.list,
+      ),
+    ],
+  },
+  {
+    method: ["POST"],
+    matcher: "\${apiPathAdmin}",
+    middlewares: [
+      validateAndTransformBody(AdminCreate\${model.singular}),
+      validateAndTransformQuery(
+        AdminGet\${model.singular}Params,
+        adminTnpl\${model.plural}QueryConfig.retrieve,
+      ),
+    ],
+  },
+  {
+    method: ["GET"],
+    matcher: "\${apiPathAdmin}/:\${model.idParam}",
+    middlewares: [
+      validateAndTransformQuery(
+        AdminGet\${model.singular}Params,
+        adminTnpl\${model.plural}QueryConfig.retrieve,
+      ),
+    ],
+  },
+  {
+    method: ["PUT"],
+    matcher: "\${apiPathAdmin}/:\${model.idParam}",
+    middlewares: [
+      validateAndTransformBody(AdminUpdate\${model.singular}),
+      validateAndTransformQuery(
+        AdminGet\${model.singular}Params,
+        adminTnpl\${model.plural}QueryConfig.retrieve,
+      ),
+    ],
+  },
+  {
+    method: ["DELETE"],
+    matcher: "\${apiPathAdmin}/:\${model.idParam}",
+    middlewares: [
+      validateAndTransformQuery(
+        AdminGet\${model.singular}Params,
+        adminTnpl\${model.plural}QueryConfig.delete,
+      ),
+    ],
+  },
+];
+\`;
+  fs.writeFileSync(path.join(mDir, 'admin.ts'), adminTs.trim() + '\\n');
+
+  const storeTs = \`import { MiddlewareRoute } from "@medusajs/medusa";
+
+export const storeTnpl\${model.plural}PathMiddlewares: MiddlewareRoute[] = [
+  {
+    method: ["GET"],
+    matcher: "\${apiPathStore}",
+    middlewares: [],
+  },
+  {
+    method: ["GET"],
+    matcher: "\${apiPathStore}/:\${model.idParam}",
+    middlewares: [],
+  },
+  {
+    method: ["POST"],
+    matcher: "\${apiPathStore}",
+    middlewares: [],
+  },
+  {
+    method: ["PUT"],
+    matcher: "\${apiPathStore}/:\${model.idParam}",
+    middlewares: [],
+  },
+];
+\`;
+  fs.writeFileSync(path.join(mDir, 'store.ts'), storeTs.trim() + '\\n');
+  fs.writeFileSync(path.join(mDir, 'index.ts'), 'export * from "./admin";\\nexport * from "./store";\\n');
+}
+
+topLevelModels.forEach(m => generateMiddleware(m, false));
+nestedModels.forEach(m => generateMiddleware(m, true));
+
+const parents = [...new Set(nestedModels.map(m => m.middlewareDir.split('/')[0]))];
+parents.forEach(pDir => {
+  const children = nestedModels.filter(m => m.middlewareDir.startsWith(pDir + '/'));
+  let directExports = '';
+  if (topLevelModels.find(m => m.name === pDir)) {
+    directExports += \`export * from "./admin";\\nexport * from "./store";\\n\`;
+  }
+  children.forEach(c => {
+    directExports += \`export * from "./\${c.middlewareDir.split('/')[1]}";\\n\`;
+  });
+  fs.writeFileSync(path.join(middlewareDir, pDir, 'index.ts'), directExports);
+});
+
+const mainExports = topLevelModels.map(m => \`export * from "./\${m.name}";\`).join('\\n') + '\\n';
+fs.writeFileSync(path.join(middlewareDir, 'index.ts'), mainExports);
+
+console.log('Middlewares generation complete.');
+```
+
+---
+
+### 4. API Endpoints Generator ([generate_apis.js](file:///Users/abellamesgen/Documents/work/New/client/bitperfect/bitperfect/generate_apis.js))
+This handles building actual `GET`, `POST`, `PUT`, `DELETE` path wrappers mapped to your TNPL route services, fully supporting the nested Medusa patterns (e.g. `api/admin/tnpl/orders/[tnplOrderId]/items/[tnplOrderItemId]/route.ts`).
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const topLevelModels = [
+  { name: 'adminAction', singular: 'AdminAction', plural: 'AdminActions', pathKebab: 'admin-actions', idParam: 'tnplAdminActionId' },
+  { name: 'chargeSchedule', singular: 'ChargeSchedule', plural: 'ChargeSchedules', pathKebab: 'charge-schedules', idParam: 'tnplChargeScheduleId' },
+  { name: 'config', singular: 'Config', plural: 'Configs', pathKebab: 'configs', idParam: 'tnplConfigId' },
+  { name: 'notification', singular: 'Notification', plural: 'Notifications', pathKebab: 'notifications', idParam: 'tnplNotificationId' },
+  { name: 'order', singular: 'Order', plural: 'Orders', pathKebab: 'orders', idParam: 'tnplOrderId' },
+  { name: 'payment', singular: 'Payment', plural: 'Payments', pathKebab: 'payments', idParam: 'tnplPaymentId' },
+  { name: 'return', singular: 'Return', plural: 'Returns', pathKebab: 'returns', idParam: 'tnplReturnId' },
+];
+
+const nestedModels = [
+  { name: 'orderHistory', singular: 'OrderHistory', plural: 'OrderHistories', parentPath: 'orders', parentParam: 'tnplOrderId', pathKebab: 'histories', idParam: 'tnplOrderHistoryId' },
+  { name: 'orderItem', singular: 'OrderItem', plural: 'OrderItems', parentPath: 'orders', parentParam: 'tnplOrderId', pathKebab: 'items', idParam: 'tnplOrderItemId' },
+  { name: 'defaultConfig', singular: 'DefaultConfig', plural: 'DefaultConfigs', parentPath: 'configs', parentParam: 'tnplConfigId', pathKebab: 'default', idParam: 'tnplDefaultConfigId' },
+  { name: 'configMinFee', singular: 'ConfigMinFee', plural: 'ConfigMinFees', parentPath: 'configs', parentParam: 'tnplConfigId', pathKebab: 'min-fees', idParam: 'tnplConfigMinFeeId' },
+  { name: 'returnItem', singular: 'ReturnItem', plural: 'ReturnItems', parentPath: 'returns', parentParam: 'tnplReturnId', pathKebab: 'items', idParam: 'tnplReturnItemId' },
+];
+
+const apiAdminDir = path.join(__dirname, 'apps/backend/src/api/admin/tnpl');
+const apiStoreDir = path.join(__dirname, 'apps/backend/src/api/store/tnpl');
+
+fs.mkdirSync(apiAdminDir, { recursive: true });
+fs.mkdirSync(apiStoreDir, { recursive: true });
+
+function generateApi(model, isNested) {
+  const urlBasePath = isNested
+    ? \`\${model.parentPath}/[\${model.parentParam}]/\${model.pathKebab}\`
+    : model.pathKebab;
+
+  const adminBaseDir = path.join(apiAdminDir, urlBasePath);
+  const storeBaseDir = path.join(apiStoreDir, urlBasePath);
+
+  fs.mkdirSync(adminBaseDir, { recursive: true });
+  fs.mkdirSync(storeBaseDir, { recursive: true });
+
+  const numUp = isNested ? 6 : 4;
+  const backLevels = Array(numUp).fill('..').join('/');
+
+  const baseTs = \`import {
+  tnpl\${model.singular}CreateService,
+  tnpl\${model.singular}GetAllService,
+} from "\${backLevels}/router/service/tnpl/\${model.name}";
+
+export const GET = tnpl\${model.singular}GetAllService;
+export const POST = tnpl\${model.singular}CreateService;
+\`;
+  fs.writeFileSync(path.join(adminBaseDir, 'route.ts'), baseTs.trim() + '\\n');
+  fs.writeFileSync(path.join(storeBaseDir, 'route.ts'), baseTs.trim() + '\\n');
+
+  const adminIdDir = path.join(adminBaseDir, \`[\${model.idParam}]\`);
+  const storeIdDir = path.join(storeBaseDir, \`[\${model.idParam}]\`);
+  fs.mkdirSync(adminIdDir, { recursive: true });
+  fs.mkdirSync(storeIdDir, { recursive: true });
+
+  const idTs = \`import {
+  tnpl\${model.singular}DeleteService,
+  tnpl\${model.singular}GetService,
+  tnpl\${model.singular}UpdateService,
+} from "\${backLevels}/../router/service/tnpl/\${model.name}";
+
+export const GET = tnpl\${model.singular}GetService;
+export const PUT = tnpl\${model.singular}UpdateService;
+export const DELETE = tnpl\${model.singular}DeleteService;
+\`;
+  fs.writeFileSync(path.join(adminIdDir, 'route.ts'), idTs.trim() + '\\n');
+  fs.writeFileSync(path.join(storeIdDir, 'route.ts'), idTs.trim() + '\\n');
+}
+
+topLevelModels.forEach(m => generateApi(m, false));
+nestedModels.forEach(m => generateApi(m, true));
+
+console.log('API Endpoints generation complete.');
+```
