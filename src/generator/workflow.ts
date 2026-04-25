@@ -6,7 +6,6 @@ import generateIndexWorkflows from "../templates/index/workflows";
 import generateIndexSteps from "../templates/index/steps";
 import generateCreateSteps from "../templates/workflows/step/create";
 import generateUpdateSteps from "../templates/workflows/step/update";
-import generateUnlinkSteps from "../templates/workflows/step/unlink";
 import generateDeleteSteps from "../templates/workflows/step/delete";
 import generateCreateWorkflows from "../templates/workflows/workflow/create";
 import generateUpdateWorkflows from "../templates/workflows/workflow/update";
@@ -45,13 +44,6 @@ export const workflowGenerator = async ({
       dir: path.join(srcDir, `workflows/${fileName}/steps/${baseFileName}`),
       file: `delete.ts`,
       content: generateDeleteSteps(data),
-      shouldIndex: true,
-    },
-    {
-      type: "generateUnlinkSteps",
-      dir: path.join(srcDir, `workflows/${fileName}/steps/${baseFileName}`),
-      file: `unlink.ts`,
-      content: generateUnlinkSteps(data),
       shouldIndex: true,
     },
     {
